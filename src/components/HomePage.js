@@ -30,10 +30,10 @@ class HomePage extends Component {
     })
   }
   setCurrentElment(index) {
-    let props = this.state.components[index].props
-    this.setState({
-      currentProps: props
-    })
+    // let props = this.state.components[index].props
+    // this.setState({
+    //   currentProps: props
+    // })
   }
   getRealComponent(component, index) {
     const typeMap = {

@@ -50,6 +50,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
+    "build:gh-pages": "PUBLIC_URL=/react-antd-visual node scripts/build.js;node scripts/gh-pages.js",
     "test": "node scripts/test.js --env=jsdom"
   },
   "jest": {
@@ -92,5 +93,8 @@
   },
   "eslintConfig": {
     "extends": "react-app"
+  },
+  "devDependencies": {
+    "gh-pages": "^1.0.0"
   }
 }
