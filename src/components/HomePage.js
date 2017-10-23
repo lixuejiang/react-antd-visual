@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Row, Col, Menu, Icon, Button, Input, Collapse } from 'antd'
+import MonacoEditor from 'react-monaco-editor'
 import { DragSourceWrapper, DropTargetWrapper } from '../utils/drag-drop/wrapper-component'
 import withDragDropContext from '../utils/drag-drop/withDragDropContext'
 const Panel = Collapse.Panel
@@ -16,6 +17,7 @@ class HomePage extends Component {
       }],
       currentEvents: [],
       currentStyles: [],
+      code: '// type your code...',
     }
     this.moveComponent = this.moveComponent.bind(this)
   }
@@ -54,7 +56,18 @@ class HomePage extends Component {
       currentProps: [...props]
     })
   }
+  editorDidMount(editor, monaco) {
+    console.log('editorDidMount', editor)
+    editor.focus()
+  }
+  onChange(newValue, e) {
+    console.log('onChange', newValue, e)
+  }
   render() {
+    const code = this.state.code
+    const options = {
+      selectOnLineNumbers: true
+    }
     return (
       <Row style={{ marginTop: '10px' }}>
         <Col span={4}>
@@ -179,6 +192,21 @@ class HomePage extends Component {
                   <p>{3}</p>
                 </Panel>
               </Collapse>
+            </Col>
+          </Row>
+          <h2 style={{ textAlign: 'center' }}>代码</h2>
+          <Row>
+            <Col>
+              <MonacoEditor
+                width='800'
+                height='600'
+                language='javascript'
+                theme='vs-dark'
+                value={code}
+                options={options}
+                onChange={this.onChange}
+                editorDidMount={this.editorDidMount}
+              />
             </Col>
           </Row>
         </Col>
