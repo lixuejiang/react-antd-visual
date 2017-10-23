@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import { Row, Col, Menu, Icon, Button, Input, Collapse } from 'antd'
+import { Row, Col, Menu, Icon, Button, Input, Collapse, Tabs } from 'antd'
 import MonacoEditor from 'react-monaco-editor'
 import { DragSourceWrapper, DropTargetWrapper } from '../utils/drag-drop/wrapper-component'
 import withDragDropContext from '../utils/drag-drop/withDragDropContext'
 const Panel = Collapse.Panel
 const SubMenu = Menu.SubMenu
+const TabPane = Tabs.TabPane
 
 class HomePage extends Component {
   constructor(props) {
@@ -160,15 +161,34 @@ class HomePage extends Component {
         </Col>
         <Col span={14}>
           <h2>页面区</h2>
-          <Row style={{ borderRight: '1px solid #ddd', marginTop: '10px' }}>
-            <Col>
-              <DropTargetWrapper style={{ width: '100%', height: '300px', backgroundColor: '#eaeaea' }}>
-                {this.state.components.map((component, index) => {
-                  return this.getRealComponent(component, index).element
-                })}
-              </DropTargetWrapper>
-            </Col>
-          </Row>
+          <Tabs type='card'>
+            <TabPane tab='页面' key='1'>
+              <Row style={{ borderRight: '1px solid #ddd', marginTop: '10px' }}>
+                <Col>
+                  <DropTargetWrapper style={{ width: '100%', height: '300px', backgroundColor: '#eaeaea' }}>
+                    {this.state.components.map((component, index) => {
+                      return this.getRealComponent(component, index).element
+                    })}
+                  </DropTargetWrapper>
+                </Col>
+              </Row>
+            </TabPane>
+            <TabPane tab='代码' key='2'>
+              <Row>
+                <Col>
+                  <MonacoEditor
+                    height='800'
+                    language='javascript'
+                    theme='vs-dark'
+                    value={code}
+                    options={options}
+                    onChange={this.onChange}
+                    editorDidMount={this.editorDidMount}
+                  />
+                </Col>
+              </Row>
+            </TabPane>
+          </Tabs>
         </Col>
         <Col span={6} style={{ paddingLeft: '10px' }}>
           <h2 style={{ textAlign: 'center' }}>组件属性区</h2>
@@ -192,21 +212,6 @@ class HomePage extends Component {
                   <p>{3}</p>
                 </Panel>
               </Collapse>
-            </Col>
-          </Row>
-          <h2 style={{ textAlign: 'center' }}>代码</h2>
-          <Row>
-            <Col>
-              <MonacoEditor
-                width='800'
-                height='600'
-                language='javascript'
-                theme='vs-dark'
-                value={code}
-                options={options}
-                onChange={this.onChange}
-                editorDidMount={this.editorDidMount}
-              />
             </Col>
           </Row>
         </Col>
