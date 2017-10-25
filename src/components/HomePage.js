@@ -1,23 +1,22 @@
 import React, { Component } from 'react'
-import { Row, Col, Menu, Icon, Button, Input, Collapse, Tabs } from 'antd'
+import { Row, Col, Menu, Icon, Button, Input, Collapse, Tabs, Select } from 'antd'
 import MonacoEditor from 'react-monaco-editor'
 import { DragSourceWrapper, DropTargetWrapper } from '../utils/drag-drop/wrapper-component'
 import withDragDropContext from '../utils/drag-drop/withDragDropContext'
 const Panel = Collapse.Panel
 const SubMenu = Menu.SubMenu
 const TabPane = Tabs.TabPane
+const Option = Select.Option
 
 class HomePage extends Component {
   constructor(props) {
     super(props)
     this.state = {
       components: [],
-      currentProps: [{
-        key: 'type',
-        value: 'primary',
-      }],
+      currentProps: {},
       currentEvents: [],
       currentStyles: [],
+      currentCompIndex: 0,
       code: '// type your code...',
     }
     this.moveComponent = this.moveComponent.bind(this)
@@ -25,44 +24,104 @@ class HomePage extends Component {
   moveComponent(e) {
     const type = e.type
     const key = new Date().getTime()
+    const componentProps = this.getComponentProps(type)
     this.setState({
-      components: [...this.state.components, { type, props: { key }, children: '按钮' }]
+      components: [...this.state.components, { type, props: { key: { valueType: 'hidden', value: key }, ...componentProps }, children: '按钮' }]
     })
   }
   setCurrentElment(index) {
-    // let props = this.state.components[index].props
-    // this.setState({
-    //   currentProps: props
-    // })
+    let props = this.state.components[index].props
+    console.log('setCurrentElment', props)
+    this.setState({
+      currentProps: props,
+      currentCompIndex: index
+    })
   }
-  getRealComponent(component, index) {
+  getComponentProps(type) {
     const typeMap = {
       Button: {
-        element: <Button {...component.props} onClick={this.setCurrentElment.bind(this, index)}>{component.children}</Button>,
-        props: ['type', 'htmlType', 'icon', 'shape', 'size', 'loading'],
-        event: ['onClick']
+        'type': {
+          valueType: 'select',
+          options: ['default', 'primary', 'danger', 'dashed'],
+          value: 'default'
+        },
+        'htmlType': {
+          valueType: 'select',
+          options: ['submit', 'reset', 'button'],
+          value: 'button'
+        },
+        'icon': {
+          valueType: 'input',
+          placeholder: '',
+          value: ''
+        },
+        'shape': {
+          valueType: 'select',
+          options: ['circle', 'circle-outline', ''],
+          value: ''
+        },
+        'size': {
+          valueType: 'select',
+          options: ['small', 'large', 'default'],
+          value: 'default'
+        },
+        // 'loading': {
+        //   valueType: 'select',
+        //   options: ['false', 'true'],
+        //   value: 'false'
+        // }
       },
-      Input: {
-        element: <Input {...component.props}></Input>,
-        props: ['type', 'htmlType', 'icon', 'shape', 'size', 'loading'],
-        event: ['onClick']
+    }
+    return typeMap[type]
+  }
+  getRealComponent(component, index) {
+    const props = { ...component.props }
+    let newProps = {}
+    Object.keys(props).forEach(key => {
+      if (props[key].value) {
+        newProps[key] = props[key].value
       }
+    })
+    const typeMap = {
+      Button: <Button {...newProps} onClick={this.setCurrentElment.bind(this, index)}>{component.children}</Button>,
+      Input: <Input {...newProps}></Input>,
     }
     return typeMap[component.type]
   }
-  handlePropsChange(key, index, e) {
-    let props = [this.state.currentProps]
-    props[index][key] = e.target.value.trim()
+  setCurrentProps(key, value) {
+    let props = this.state.currentProps
+    let components = [...this.state.components]
+    props[key].value = value
+    components[this.state.currentCompIndex].props = { ...props }
     this.setState({
-      currentProps: [...props]
+      currentProps: props,
+      components
     })
   }
+  handlePropsChange(key, e) {
+    this.setCurrentProps(key, e.target.value.trim())
+  }
+  handlePropsSelectChange(key, value) {
+    this.setCurrentProps(key, value)
+  }
   editorDidMount(editor, monaco) {
-    console.log('editorDidMount', editor)
     editor.focus()
   }
   onChange(newValue, e) {
     console.log('onChange', newValue, e)
+  }
+  renderPropsValue(key) {
+    if (this.state.currentProps[key].valueType === 'input') {
+      return <Input type='text' value={this.state.currentProps[key].value} onChange={this.handlePropsChange.bind(this, key)}/>
+    } else if (this.state.currentProps[key].valueType === 'select') {
+      return <Select value={this.state.currentProps[key].value} style={{ width: 120 }} onChange={this.handlePropsSelectChange.bind(this, key)}>
+        {this.state.currentProps[key].options.map(item => {
+          return <Option value={item} key={item}>{item}</Option>
+        })}
+      </Select>
+    } else {
+      return null
+    }
   }
   render() {
     const code = this.state.code
@@ -167,7 +226,7 @@ class HomePage extends Component {
                 <Col>
                   <DropTargetWrapper style={{ width: '100%', height: '300px', backgroundColor: '#eaeaea' }}>
                     {this.state.components.map((component, index) => {
-                      return this.getRealComponent(component, index).element
+                      return this.getRealComponent(component, index)
                     })}
                   </DropTargetWrapper>
                 </Col>
@@ -196,11 +255,16 @@ class HomePage extends Component {
             <Col>
               <Collapse defaultActiveKey={['1']}>
                 <Panel header='属性' key='1'>
-                  {this.state.currentProps.map((item, index) => {
+                  {Object.keys(this.state.currentProps).map((key) => {
+                    if (this.state.currentProps[key].valueType === 'hidden') {
+                      return null
+                    }
                     return (
-                      <Row key={index}>
-                        <Col span={10}>{item.key}</Col>
-                        <Col span={10}><Input type='text' value={item.value} onChange={this.handlePropsChange.bind(this, item.key, index)}/></Col>
+                      <Row key={key} style={{ marginBottom: '10px' }}>
+                        <Col span={10}>{key}</Col>
+                        <Col span={10}>
+                          {this.renderPropsValue(key)}
+                        </Col>
                       </Row>
                     )
                   })}
