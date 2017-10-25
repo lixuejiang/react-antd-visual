@@ -1,18 +1,21 @@
 import React, { Component } from 'react'
-import { Row, Col, Menu, Icon, Button, Input, Collapse, Tabs, Select } from 'antd'
+import { Row, Col, Menu, Icon, Button, Input, Collapse, Tabs, Select, Radio } from 'antd'
 import MonacoEditor from 'react-monaco-editor'
-import { DragSourceWrapper, DropTargetWrapper } from '../utils/drag-drop/wrapper-component'
-import withDragDropContext from '../utils/drag-drop/withDragDropContext'
+import { DragSourceWrapper, DropTargetWrapper } from 'Utils/drag-drop/wrapper-component'
+import withDragDropContext from 'Utils/drag-drop/withDragDropContext'
+import generateCode from 'Utils/generateCode'
+import { getComponentProps } from 'Utils/typeMap'
 const Panel = Collapse.Panel
 const SubMenu = Menu.SubMenu
 const TabPane = Tabs.TabPane
 const Option = Select.Option
+const RadioGroup = Radio.Group
 
 class HomePage extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      components: [],
+      components: [{}],
       currentProps: {},
       currentEvents: [],
       currentStyles: [],
@@ -24,55 +27,10 @@ class HomePage extends Component {
   moveComponent(e) {
     const type = e.type
     const key = new Date().getTime()
-    const componentProps = this.getComponentProps(type)
+    const componentProps = getComponentProps(type)
     this.setState({
-      components: [...this.state.components, { type, props: { key: { valueType: 'hidden', value: key }, ...componentProps }, children: '按钮' }]
+      components: [...this.state.components, { type, props: { key: { valueType: 'hidden', value: key }, ...componentProps }, children: '点击我配置属性' }]
     })
-  }
-  setCurrentElment(index) {
-    let props = this.state.components[index].props
-    console.log('setCurrentElment', props)
-    this.setState({
-      currentProps: props,
-      currentCompIndex: index
-    })
-  }
-  getComponentProps(type) {
-    const typeMap = {
-      Button: {
-        'type': {
-          valueType: 'select',
-          options: ['default', 'primary', 'danger', 'dashed'],
-          value: 'default'
-        },
-        'htmlType': {
-          valueType: 'select',
-          options: ['submit', 'reset', 'button'],
-          value: 'button'
-        },
-        'icon': {
-          valueType: 'input',
-          placeholder: '',
-          value: ''
-        },
-        'shape': {
-          valueType: 'select',
-          options: ['circle', 'circle-outline', ''],
-          value: ''
-        },
-        'size': {
-          valueType: 'select',
-          options: ['small', 'large', 'default'],
-          value: 'default'
-        },
-        // 'loading': {
-        //   valueType: 'select',
-        //   options: ['false', 'true'],
-        //   value: 'false'
-        // }
-      },
-    }
-    return typeMap[type]
   }
   getRealComponent(component, index) {
     const props = { ...component.props }
@@ -87,6 +45,13 @@ class HomePage extends Component {
       Input: <Input {...newProps}></Input>,
     }
     return typeMap[component.type]
+  }
+  setCurrentElment(index) {
+    let props = this.state.components[index].props
+    this.setState({
+      currentProps: props,
+      currentCompIndex: index
+    })
   }
   setCurrentProps(key, value) {
     let props = this.state.currentProps
@@ -104,6 +69,16 @@ class HomePage extends Component {
   handlePropsSelectChange(key, value) {
     this.setCurrentProps(key, value)
   }
+  handlePropsBoolChange(key, e) {
+    this.setCurrentProps(key, e.target.value)
+  }
+  handleChildrenChange(e) {
+    let components = [...this.state.components]
+    components[this.state.currentCompIndex].children = e.target.value.trim()
+    this.setState({
+      components
+    })
+  }
   editorDidMount(editor, monaco) {
     editor.focus()
   }
@@ -119,12 +94,17 @@ class HomePage extends Component {
           return <Option value={item} key={item}>{item}</Option>
         })}
       </Select>
+    } else if (this.state.currentProps[key].valueType === 'bool') {
+      return <RadioGroup onChange={this.handlePropsBoolChange.bind(this, key)} value={this.state.currentProps[key].value}>
+        <Radio value={true}>true</Radio>
+        <Radio value={false}>false</Radio>
+      </RadioGroup>
     } else {
       return null
     }
   }
   render() {
-    const code = this.state.code
+    const code = generateCode(this.state.components)
     const options = {
       selectOnLineNumbers: true
     }
@@ -236,7 +216,7 @@ class HomePage extends Component {
               <Row>
                 <Col>
                   <MonacoEditor
-                    height='800'
+                    height='600'
                     language='javascript'
                     theme='vs-dark'
                     value={code}
@@ -274,6 +254,11 @@ class HomePage extends Component {
                 </Panel>
                 <Panel header='样式' key='3'>
                   <p>{3}</p>
+                </Panel>
+                <Panel header='子组件' key='4'>
+                  <Row>
+                    <Input type='text' value={this.state.components[this.state.currentCompIndex].children} onChange={this.handleChildrenChange.bind(this)}/>
+                  </Row>
                 </Panel>
               </Collapse>
             </Col>
