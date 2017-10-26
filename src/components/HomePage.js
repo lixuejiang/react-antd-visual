@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Row, Col, Menu, Icon, Button, Input, Collapse, Tabs, Select, Radio } from 'antd'
+import { Row, Col, Menu, Icon, Button, Input, Collapse, Tabs, Select, Radio, Affix, Pagination } from 'antd'
 import MonacoEditor from 'react-monaco-editor'
 import { DragSourceWrapper, DropTargetWrapper } from 'Utils/drag-drop/wrapper-component'
 import withDragDropContext from 'Utils/drag-drop/withDragDropContext'
@@ -27,9 +27,14 @@ class HomePage extends Component {
   moveComponent(e) {
     const type = e.type
     const key = new Date().getTime()
-    const componentProps = getComponentProps(type)
+    let componentProps = getComponentProps(type)
+    let children = null
+    if ('children' in componentProps) {
+      children = componentProps.children
+      delete componentProps.children
+    }
     this.setState({
-      components: [...this.state.components, { type, props: { key: { valueType: 'hidden', value: key }, ...componentProps }, children: '点击我配置属性' }]
+      components: [...this.state.components, { type, props: { key: { valueType: 'hidden', value: key }, ...componentProps }, children: children }]
     })
   }
   getRealComponent(component, index) {
@@ -37,12 +42,18 @@ class HomePage extends Component {
     let newProps = {}
     Object.keys(props).forEach(key => {
       if (props[key].value) {
-        newProps[key] = props[key].value
+        if (props[key].valueType === 'number') {
+          newProps[key] = Number(props[key].value)
+        } else {
+          newProps[key] = props[key].value
+        }
       }
     })
     const typeMap = {
       Button: <Button {...newProps} onClick={this.setCurrentElment.bind(this, index)}>{component.children}</Button>,
-      Input: <Input {...newProps}></Input>,
+      Icon: <Icon {...newProps} onClick={this.setCurrentElment.bind(this, index)}></Icon>,
+      Affix: <Affix {...newProps} onClick={this.setCurrentElment.bind(this, index)}>{component.children}</Affix>,
+      Pagination: <Pagination {...newProps} onClick={this.setCurrentElment.bind(this, index)}></Pagination>,
     }
     return typeMap[component.type]
   }
@@ -86,16 +97,17 @@ class HomePage extends Component {
     console.log('onChange', newValue, e)
   }
   renderPropsValue(key) {
-    if (this.state.currentProps[key].valueType === 'input') {
-      return <Input type='text' value={this.state.currentProps[key].value} onChange={this.handlePropsChange.bind(this, key)}/>
-    } else if (this.state.currentProps[key].valueType === 'select') {
-      return <Select value={this.state.currentProps[key].value} style={{ width: 120 }} onChange={this.handlePropsSelectChange.bind(this, key)}>
+    const { valueType, value } = this.state.currentProps[key]
+    if (valueType === 'input' || valueType === 'number') {
+      return <Input type='text' value={value} onChange={this.handlePropsChange.bind(this, key)}/>
+    } else if (valueType === 'select') {
+      return <Select value={value} style={{ width: 120 }} onChange={this.handlePropsSelectChange.bind(this, key)}>
         {this.state.currentProps[key].options.map(item => {
           return <Option value={item} key={item}>{item}</Option>
         })}
       </Select>
-    } else if (this.state.currentProps[key].valueType === 'bool') {
-      return <RadioGroup onChange={this.handlePropsBoolChange.bind(this, key)} value={this.state.currentProps[key].value}>
+    } else if (valueType === 'bool') {
+      return <RadioGroup onChange={this.handlePropsBoolChange.bind(this, key)} value={value}>
         <Radio value={true}>true</Radio>
         <Radio value={false}>false</Radio>
       </RadioGroup>
@@ -120,19 +132,19 @@ class HomePage extends Component {
             mode='inline'
           >
             <SubMenu key='sub1' title={<span><Icon type='mail' /><span>General</span></span>}>
-              <Menu.Item key='1'><DragSourceWrapper moveComponent={this.moveComponent} type='Button'>Button 按钮</DragSourceWrapper></Menu.Item>
-              <Menu.Item key='2'>Icon 图标</Menu.Item>
+              <Menu.Item key='1'><DragSourceWrapper moveComponent={this.moveComponent} type='Button'>按钮(可拖拽)</DragSourceWrapper></Menu.Item>
+              <Menu.Item key='2'><DragSourceWrapper moveComponent={this.moveComponent} type='Icon'>图标(可拖拽)</DragSourceWrapper></Menu.Item>
             </SubMenu>
             <SubMenu key='sub2' title={<span><Icon type='appstore' /><span>Layout</span></span>}>
               <Menu.Item key='5'>Grid 栅格</Menu.Item>
               <Menu.Item key='6'>Layout 布局</Menu.Item>
             </SubMenu>
             <SubMenu key='sub4' title={<span><Icon type='setting' /><span>Navigation</span></span>}>
-              <Menu.Item key='sub49'>Affix固钉</Menu.Item>
+              <Menu.Item key='sub49'><DragSourceWrapper moveComponent={this.moveComponent} type='Affix'>Affix固钉(可拖拽)</DragSourceWrapper></Menu.Item>
               <Menu.Item key='sub410'>Breadcrumb面包屑</Menu.Item>
               <Menu.Item key='sub411'>Dropdown下拉菜单</Menu.Item>
               <Menu.Item key='sub412'>Menu导航菜单</Menu.Item>
-              <Menu.Item key='sub413'>Pagination分页</Menu.Item>
+              <Menu.Item key='sub413'><DragSourceWrapper moveComponent={this.moveComponent} type='Pagination'>Pagination分页</DragSourceWrapper></Menu.Item>
               <Menu.Item key='sub414'>Steps步骤条</Menu.Item>
             </SubMenu>
             <SubMenu key='sub5' title={<span><Icon type='setting' /><span>Data Entry</span></span>}>

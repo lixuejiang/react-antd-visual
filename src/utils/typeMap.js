@@ -1,3 +1,6 @@
+// import React from 'react'
+// import { Button } from 'antd'
+
 export function getComponentProps(type) {
   const typeMap = {
     Button: {
@@ -29,8 +32,67 @@ export function getComponentProps(type) {
       'loading': {
         valueType: 'bool',
         value: false
+      },
+      children: '点击我配置属性'
+    },
+    Icon: {
+      'type': {
+        valueType: 'input',
+        placeholder: '参考 iconfont.cn',
+        value: 'up'
+      },
+      'spin': {
+        valueType: 'bool',
+        value: false
       }
     },
+    Affix: {
+      offsetTop: {
+        valueType: 'number',
+        placeholder: '数字',
+        value: 0
+      },
+      offsetBottom: {
+        valueType: 'number',
+        placeholder: '数字',
+        value: 0
+      },
+      children: 'Affix'
+    },
+    Pagination: {
+      current: {
+        valueType: 'number',
+        placeholder: '数字',
+        value: 0
+      },
+      total: {
+        valueType: 'number',
+        placeholder: '数字',
+        value: 0
+      },
+      pageSize: {
+        valueType: 'number',
+        placeholder: '数字',
+        value: 0
+      },
+      showSizeChanger: {
+        valueType: 'bool',
+        value: false
+      },
+      showQuickJumper: {
+        valueType: 'bool',
+        value: false
+      },
+      size: {
+        valueType: 'select',
+        options: ['small', 'default'],
+        value: 'default'
+      },
+      simple: {
+        valueType: 'bool',
+        value: false
+      },
+    }
   }
   return typeMap[type]
 }

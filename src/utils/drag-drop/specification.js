@@ -7,10 +7,10 @@ export const dragTarget = {
     return { id: props.id }
   },
   endDrag(props, monitor) {
-    console.log('endDrag')
     if (!monitor.didDrop()) return
     const targetID = monitor.getDropResult().id
     const type = props.type
+    console.log('endDrag', targetID)
     props.moveComponent({ type }, targetID)
   }
 }

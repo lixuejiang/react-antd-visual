@@ -5,7 +5,6 @@ function getAntdCompList(components) {
       set.add(component.type)
     }
   })
-  console.log(Array.from(set), set)
   return Array.from(set).join(', ')
 }
 function getRealComponent(component) {
@@ -13,22 +12,21 @@ function getRealComponent(component) {
   let propsArr = []
   Object.keys(props).forEach(key => {
     if (props[key].value) {
-      if (props[key].valueType === 'bool') {
+      if (props[key].valueType === 'bool' || props[key].valueType === 'number') {
         propsArr.push(`${key}={${props[key].value}}`)
       } else {
         propsArr.push(`${key}='${props[key].value}'`)
       }
     }
   })
-  const typeMap = {
-    Button: `<Button ${propsArr.join(' ')}>${component.children}</Button>`,
-    Input: `<Input {...newProps}></Input>`,
-  }
-  return typeMap[component.type]
+  return `<${component.type} ${propsArr.join(' ')}>${component.children ? component.children : ''}</${component.type}>`
 }
 
 function getCompJSX(components) {
   let arr = []
+  components = components.filter(component => {
+    return !!component.type
+  })
   arr = components.map(component => {
     return `${getRealComponent(component)}`
   })
