@@ -1,5 +1,5 @@
 # 基于react+antd的后台管理系统可视化生成工具
-[预览地址](http://www.lixuejiang.me/react-antd-visual/index.html)
+[预览地址](http://www.lixuejiang.me/react-antd-visual/index.html)[![Build Status](https://travis-ci.org/lixuejiang/react-antd-visual.svg?branch=master)](https://travis-ci.org/lixuejiang/react-antd-visual)
 ## 涉及技术
 
 ### 脚手架
