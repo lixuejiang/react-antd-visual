@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Row, Col, Menu, Icon, Button, Input, Collapse, Tabs, Select, Radio, Affix, Pagination } from 'antd'
+import { Row, Col, Menu, Icon, Input, Collapse, Tabs, Select, Radio } from 'antd'
+import * as antd from 'antd'
 import MonacoEditor from 'react-monaco-editor'
 import { DragSourceWrapper, DropTargetWrapper } from 'Utils/drag-drop/wrapper-component'
 import withDragDropContext from 'Utils/drag-drop/withDragDropContext'
@@ -24,17 +25,24 @@ class HomePage extends Component {
     }
     this.moveComponent = this.moveComponent.bind(this)
   }
-  moveComponent(e) {
+  moveComponent(e, targetId) {
     const type = e.type
     const key = new Date().getTime()
     let componentProps = getComponentProps(type)
+    let components = [...this.state.components]
     let children = null
     if ('children' in componentProps) {
       children = componentProps.children
       delete componentProps.children
     }
+    const component = { type, props: { key: { valueType: 'hidden', value: key }, ...componentProps }, children: children }
+    if (targetId !== undefined) {
+      components[targetId].children = component
+    } else {
+      components.push(component)
+    }
     this.setState({
-      components: [...this.state.components, { type, props: { key: { valueType: 'hidden', value: key }, ...componentProps }, children: children }]
+      components: [...components]
     })
   }
   getRealComponent(component, index) {
@@ -49,19 +57,36 @@ class HomePage extends Component {
         }
       }
     })
-    const typeMap = {
-      Button: <Button {...newProps} onClick={this.setCurrentElment.bind(this, index)}>{component.children}</Button>,
-      Icon: <Icon {...newProps} onClick={this.setCurrentElment.bind(this, index)}></Icon>,
-      Affix: <Affix {...newProps} onClick={this.setCurrentElment.bind(this, index)}>{component.children}</Affix>,
-      Pagination: <Pagination {...newProps} onClick={this.setCurrentElment.bind(this, index)}></Pagination>,
+    let result = React.createElement(antd[component.type], { ...newProps }, null)
+    if (component.children) {
+      if (typeof component.children === 'object') {
+        result = React.createElement(
+          antd[component.type],
+          { ...newProps },
+          [<div
+            style={{ display: 'inline-block', border: '2px solid #ddd' }}
+            key={component.props.key.value}
+            onClick={this.setCurrentElment.bind(this, index, 0)}>
+            {this.getRealComponent(component.children, 0)}
+          </div>
+          ]
+        )
+      } else {
+        result = React.createElement(antd[component.type], { ...newProps }, [component.children])
+      }
+      return (
+        <DropTargetWrapper id={index}>
+          {result}
+        </DropTargetWrapper>
+      )
     }
-    return typeMap[component.type]
+    return result
   }
-  setCurrentElment(index) {
-    let props = this.state.components[index].props
+  setCurrentElment(componentsIndex, childrenIndex) {
+    let props = this.state.components[componentsIndex].props
     this.setState({
       currentProps: props,
-      currentCompIndex: index
+      currentCompIndex: componentsIndex
     })
   }
   setCurrentProps(key, value) {
@@ -216,9 +241,19 @@ class HomePage extends Component {
             <TabPane tab='页面' key='1'>
               <Row style={{ borderRight: '1px solid #ddd', marginTop: '10px' }}>
                 <Col>
-                  <DropTargetWrapper style={{ width: '100%', height: '300px', backgroundColor: '#eaeaea' }}>
+                  <DropTargetWrapper style={{ width: '100%', height: '600px', backgroundColor: '#eaeaea' }}>
                     {this.state.components.map((component, index) => {
-                      return this.getRealComponent(component, index)
+                      if (component.props) {
+                        return (
+                          <div
+                            style={{ display: 'inline-block', border: '2px solid #ddd' }}
+                            key={component.props.key.value}
+                            onClick={this.setCurrentElment.bind(this, index)}>
+                            {this.getRealComponent(component, index)}
+                          </div>
+                        )
+                      }
+                      return null
                     })}
                   </DropTargetWrapper>
                 </Col>
