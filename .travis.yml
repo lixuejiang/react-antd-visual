@@ -6,3 +6,10 @@ cache:
     - node_modules
 script:
   - npm run build:gh-pages
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: 9063e562516703a9623ea844ae6ede6662dd2bc8 # Set in travis-ci.org dashboard
+  on:
+    branch: master
+    local_dir: ./build
