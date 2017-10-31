@@ -1,0 +1,90 @@
+{
+  "name": "lixuejiang/react-antd-visual",
+  "version": "0.1.4",
+  "libraries": {
+    "xv": "^1.1.25"
+  },
+  "title": "",
+  "branch": "",
+  "style": {
+    "name": "Material",
+    "componentSet": {
+      "nav": "nav/DarkAbsoluteNav",
+      "header": "header/GradientHeader",
+      "article": "article/BasicArticle",
+      "footer": "footer/BasicFooter"
+    },
+    "fontFamily": "Roboto, sans-serif",
+    "heading": {
+      "fontWeight": 500,
+      "letterSpacing": "-0.01em"
+    },
+    "colors": {
+      "text": "#212121",
+      "background": "#fff",
+      "primary": "#2196f3",
+      "secondary": "#1565c0",
+      "highlight": "#ff4081",
+      "border": "#e0e0e0",
+      "muted": "#f5f5f5"
+    },
+    "layout": {
+      "centered": true,
+      "bannerHeight": "80vh",
+      "maxWidth": 896
+    }
+  },
+  "content": [
+    {
+      "component": "nav",
+      "links": [
+        {
+          "href": "https://github.com/lixuejiang/react-antd-visual",
+          "text": "GitHub"
+        },
+        {
+          "href": "https://npmjs.com/package/react-antd-visual",
+          "text": "npm"
+        }
+      ]
+    },
+    {
+      "component": "header",
+      "heading": "react-antd-visual",
+      "subhead": "基于react和antd的后台可视化生成系统",
+      "children": [
+        {
+          "component": "ui/TweetButton",
+          "text": "react-antd-visual: 基于react和antd的后台可视化生成系统",
+          "url": null
+        },
+        {
+          "component": "ui/GithubButton",
+          "user": "lixuejiang",
+          "repo": "react-antd-visual"
+        }
+      ],
+      "text": "v0.1.0"
+    },
+    {
+      "component": "article",
+      "metadata": {
+        "source": "github.readme"
+      },
+      "html": "<h1>&#x57FA;&#x4E8E;react+antd&#x7684;&#x540E;&#x53F0;&#x7BA1;&#x7406;&#x7CFB;&#x7EDF;&#x53EF;&#x89C6;&#x5316;&#x751F;&#x6210;&#x5DE5;&#x5177;</h1>\n<p><a href=\"http://www.lixuejiang.me/react-antd-visual/index.html\">&#x9884;&#x89C8;&#x5730;&#x5740;</a><a href=\"https://travis-ci.org/lixuejiang/react-antd-visual\"><img src=\"https://travis-ci.org/lixuejiang/react-antd-visual.svg?branch=master\"></a></p>\n<h2>&#x6D89;&#x53CA;&#x6280;&#x672F;</h2>\n<h3>&#x811A;&#x624B;&#x67B6;</h3>\n<ul>\n<li>create-react-app</li>\n</ul>\n<h3>&#x6280;&#x672F;</h3>\n<ul>\n<li>react</li>\n<li>antd</li>\n<li>react-dnd</li>\n<li>react-hot-reloader</li>\n</ul>\n<h2>&#x8FD0;&#x884C;&#x6B65;&#x9AA4;</h2>\n<pre>git clone http<span class=\"hljs-variable\">s:</span>//github.<span class=\"hljs-keyword\">com</span>/lixuejiang/react-antd-<span class=\"hljs-keyword\">visual</span>.git\n<span class=\"hljs-keyword\">cd</span> react-antd-<span class=\"hljs-keyword\">visual</span>\nyarn\nyarn start</pre>"
+    },
+    {
+      "component": "footer",
+      "links": [
+        {
+          "href": "https://github.com/lixuejiang/react-antd-visual",
+          "text": "GitHub"
+        },
+        {
+          "href": "https://github.com/lixuejiang",
+          "text": "lixuejiang"
+        }
+      ]
+    }
+  ]
+}
