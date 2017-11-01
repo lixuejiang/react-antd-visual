@@ -23,7 +23,8 @@ module.exports = {
     window: false,
     "TEST": true,
     "DEV": true,
-    "PRE": true
+    "PRE": true,
+    'Bugsnag': true,
   },
 
   // http://eslint.org/docs/rules/xxx, xxx代表rule名称, 0=off, 1=warning, 2=error

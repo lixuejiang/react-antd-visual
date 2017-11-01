@@ -19,7 +19,17 @@ function getRealComponent(component) {
       }
     }
   })
-  return `<${component.type} ${propsArr.join(' ')}>${component.children ? component.children : ''}</${component.type}>`
+  if (component.children) {
+    let childrens = component.children.map((item, index) => {
+      if (typeof item === 'object') {
+        const childCom = getRealComponent(item)
+        return childCom
+      }
+      return item
+    })
+    return `<${component.type} ${propsArr.join(' ')}>\n\t\t\t\t\t${childrens.join('\n\t\t\t\t\t')}\n\t\t\t\t</${component.type}>`
+  }
+  return `<${component.type} ${propsArr.join(' ')}></${component.type}>`
 }
 
 function getCompJSX(components) {

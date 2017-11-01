@@ -37,7 +37,7 @@ class HomePage extends Component {
     }
     const component = { type, props: { key: { valueType: 'hidden', value: key }, ...componentProps }, children: children }
     if (targetId !== undefined) {
-      components[targetId].children = component
+      components[targetId].children.push(component)
     } else {
       components.push(component)
     }
@@ -59,21 +59,29 @@ class HomePage extends Component {
     })
     let result = React.createElement(antd[component.type], { ...newProps }, null)
     if (component.children) {
-      if (typeof component.children === 'object') {
-        result = React.createElement(
-          antd[component.type],
-          { ...newProps },
-          [<div
-            style={{ display: 'inline-block', border: '2px solid #ddd' }}
-            key={component.props.key.value}
-            onClick={this.setCurrentElment.bind(this, index, 0)}>
-            {this.getRealComponent(component.children, 0)}
-          </div>
-          ]
-        )
-      } else {
-        result = React.createElement(antd[component.type], { ...newProps }, [component.children])
-      }
+      let childrens = component.children.map((item, childIndex) => {
+        if (typeof item === 'object') {
+          return (
+            <div
+              style={{ display: 'inline-block', border: '2px solid #ddd' }}
+              key={item.props.key.value}
+              onClick={this.setCurrentElment.bind(this, index, childIndex)}>
+              {this.getRealComponent(item, childIndex)}
+            </div>
+          )
+        } else {
+          const key = new Date().getTime()
+          return (
+            <div
+              style={{ display: 'inline-block', border: '2px solid #ddd' }}
+              key={key}
+              onClick={this.setCurrentElment.bind(this, index, childIndex)}>
+              {React.createElement('span', {}, [item])}
+            </div>
+          )
+        }
+      })
+      result = React.createElement(antd[component.type], { ...newProps }, childrens)
       return (
         <DropTargetWrapper id={index}>
           {result}
@@ -82,12 +90,23 @@ class HomePage extends Component {
     }
     return result
   }
-  setCurrentElment(componentsIndex, childrenIndex) {
-    let props = this.state.components[componentsIndex].props
-    this.setState({
-      currentProps: props,
-      currentCompIndex: componentsIndex
-    })
+  setCurrentElment(componentsIndex, childrenIndex, e) {
+    console.log(componentsIndex, childrenIndex, e)
+    if (childrenIndex === null) {
+      let props = this.state.components[componentsIndex].props
+      this.setState({
+        currentProps: props,
+        currentCompIndex: componentsIndex
+      })
+    } else {
+      e.stopPropagation()
+      let props = this.state.components[componentsIndex].children[childrenIndex].props
+      this.setState({
+        currentProps: props,
+        currentCompIndex: componentsIndex,
+        currentChildrenIndex: childrenIndex
+      })
+    }
   }
   setCurrentProps(key, value) {
     let props = this.state.currentProps
@@ -110,7 +129,7 @@ class HomePage extends Component {
   }
   handleChildrenChange(e) {
     let components = [...this.state.components]
-    components[this.state.currentCompIndex].children = e.target.value.trim()
+    components[this.state.currentCompIndex].children[0] = e.target.value.trim()
     this.setState({
       components
     })
@@ -248,7 +267,7 @@ class HomePage extends Component {
                           <div
                             style={{ display: 'inline-block', border: '2px solid #ddd' }}
                             key={component.props.key.value}
-                            onClick={this.setCurrentElment.bind(this, index)}>
+                            onClick={this.setCurrentElment.bind(this, index, null)}>
                             {this.getRealComponent(component, index)}
                           </div>
                         )

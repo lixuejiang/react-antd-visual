@@ -33,7 +33,7 @@ export function getComponentProps(type) {
         valueType: 'bool',
         value: false
       },
-      children: '点击我配置属性'
+      children: ['点击我配置属性']
     },
     Icon: {
       'type': {
@@ -57,7 +57,7 @@ export function getComponentProps(type) {
         placeholder: '数字',
         value: 0
       },
-      children: 'Affix'
+      children: ['Affix']
     },
     Pagination: {
       current: {
